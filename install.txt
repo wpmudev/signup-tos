@@ -1,0 +1,11 @@
+Plugin Name: Signup TOS
+Author: Andrew Billits
+
+Files:
+----------------------------------------------------------------------
+signup-tos.php - goes in /wp-content/mu-plugins
+
+Instructions:
+----------------------------------------------------------------------
+1) Place the files in the specified directories
+2) Visit the plugin page under the site admin to configure the plugin.
