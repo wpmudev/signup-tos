@@ -1,11 +1,10 @@
 <?php
 /*
 Plugin Name: Signup TOS
-Plugin URI: 
-Description:
-Author: Andrew Billits
-Version: 1.1.0
-Author URI:
+Plugin URI: http://premium.wpmudev.org/project/terms-of-service
+Description: This plugin places a Terms of Service box on the WP Multisite or BuddyPress signup form forcing the user to tick the associated checkbox in order to continue
+Author: Andrew Billits & Aaron Edwards
+Version: 1.2.0
 WDP ID: 8
 */
 
@@ -42,15 +41,20 @@ add_action('plugins_loaded', 'signup_tos_localization');
 
 function signup_tos_localization() {
   // Load up the localization file if we're using WordPress in a different language
-	// Place it in the mu-plugins folder and name it "tos-LOCALE.mo"
-	load_muplugin_textdomain( 'tos' );
+	// Place it in the mu-plugins folder or plugins and name it "tos-LOCALE.mo"
+	if (is_multisite())
+    load_muplugin_textdomain( 'tos' );
+  else
+    load_plugin_textdomain( 'tos' );
 }
 
 function signup_tos_plug_pages() {
 	global $wpdb, $wp_roles, $current_user;
-	if ( is_site_admin() ) {
+	if ( is_multisite() ) {
 		add_submenu_page('ms-admin.php', __('TOS', 'tos'), __('TOS', 'tos'), 10, 'signup-tos', 'signup_tos_page_main_output');
-	}
+	} else {
+    add_options_page(__('TOS', 'tos'), __('TOS', 'tos'), 'manage_options', 'signup-tos', 'signup_tos_page_main_output');
+  }
 }
 
 //------------------------------------------------------------------------//
@@ -61,7 +65,10 @@ function signup_tos_field_wpmu($errors) {
 	if (!empty($errors)){
 		$error = $errors->get_error_message('tos');
 	}
-	$signup_tos = get_site_option('signup_tos_data');
+  if (is_multisite())
+    $signup_tos = get_site_option('signup_tos_data');
+  else
+    $signup_tos = get_option('signup_tos_data');
 	if ( !empty( $signup_tos ) ) {
 	?>
     <label for="tos_content"><?php _e('Terms Of Service', 'tos'); ?>:</label>
@@ -78,13 +85,16 @@ function signup_tos_field_wpmu($errors) {
 }
 
 function signup_tos_field_bp() {
-	$signup_tos = get_site_option('signup_tos_data');
+  if (is_multisite())
+    $signup_tos = get_site_option('signup_tos_data');
+  else
+    $signup_tos = get_option('signup_tos_data');
 	if ( !empty( $signup_tos ) ) {
 	?>
     <div class="register-section" id="blog-details-section">
     <label for="tos_content"><?php _e('Terms Of Service', 'tos'); ?></label>
+    <?php do_action( 'bp_tos_agree_errors' ) ?>
     <div id="tos_content" style="height:150px;width:100%;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;"><?php echo $signup_tos ?></div>
-		<?php do_action( 'bp_tos_agree_errors' ) ?>
     <label for="tos_agree"><input type="checkbox" id="tos_agree" name="tos_agree" value="1" /> <?php _e('I Agree', 'tos'); ?></label>
     </div>
 	<?php
@@ -92,7 +102,10 @@ function signup_tos_field_bp() {
 }
 
 function signup_tos_filter_wpmu($content) {
-	$signup_tos = get_site_option('signup_tos_data');
+  if (is_multisite())
+    $signup_tos = get_site_option('signup_tos_data');
+  else
+    $signup_tos = get_option('signup_tos_data');
 	if ( !empty( $signup_tos ) ) {
 		$tos_agree = (int) $_POST['tos_agree'];
 		if($tos_agree == '0' && $_POST['stage'] == 'validate-user-signup') {
@@ -112,7 +125,10 @@ function signup_tos_filter_wpmu($content) {
 
 function signup_tos_filter_bp() {
 	global $bp;
-	$signup_tos = get_site_option('signup_tos_data');
+  if (is_multisite())
+    $signup_tos = get_site_option('signup_tos_data');
+  else
+    $signup_tos = get_option('signup_tos_data');
 	if ( !empty( $signup_tos ) ) {
 		$tos_agree = (int) $_POST['tos_agree'];
 		if($tos_agree == '0' && isset($_POST['signup_username'])) {
@@ -132,51 +148,42 @@ function signup_tos_filter_bp() {
 function signup_tos_page_main_output() {
 	global $wpdb, $wp_roles, $current_user;
 
-	if(!is_super_admin()) {
+	if((is_multisite() && !is_super_admin()) || !current_user_can('manage_options')) {
 		echo "<p>Nice Try...</p>";  //If accessed properly, this message doesn't appear.
 		return;
 	}
 
-	if (isset($_GET['updated'])) {
-		?><div id="message" class="updated fade"><p><?php echo urldecode($_GET['updatedmsg']); ?></p></div><?php
-	}
 	echo '<div class="wrap">';
-	switch( $_GET[ 'action' ] ) {
-		//---------------------------------------------------//
-		default:
-		?>
-        <h2><?php _e('Terms of Service', 'tos') ?></h2>
-        <form method="post" action="ms-admin.php?page=signup-tos&action=update">
-        <table class="form-table">
-        <tr valign="top">
-        <th scope="row"><?php _e('TOS Content: (HTML allowed)', 'tos') ?></th>
-        <td>
-        <textarea name="signup_tos_data" type="text" rows="5" wrap="soft" id="signup_tos_data" style="width: 95%"/><?php echo esc_attr(get_site_option('signup_tos_data')); ?></textarea>
-        <br /></td>
-        </tr>
-        </table>
-        
-        <p class="submit">
-        <input type="submit" name="Submit" value="<?php _e('Save Changes', 'tos') ?>" />
-        </p>
-        </form>
-        <?php
-		break;
-		//---------------------------------------------------//
-		case "update":
-			update_site_option( "signup_tos_data", stripslashes($_POST['signup_tos_data']) );
-			echo __("<p>Options saved.</p>", 'tos');
-			echo "
-			<SCRIPT LANGUAGE='JavaScript'>
-			window.location='ms-admin.php?page=signup-tos&updated=true&updatedmsg=" . urlencode(__('Settings saved.', 'tos')) . "';
-			</script>
-			";
-		break;
-		//---------------------------------------------------//
-		case "temp":
-		break;
-		//---------------------------------------------------//
+	if (isset($_POST['signup_tos_data'])) {
+    if (is_multisite())
+      update_site_option( "signup_tos_data", stripslashes($_POST['signup_tos_data']) );
+    else
+      update_option( "signup_tos_data", stripslashes($_POST['signup_tos_data']) );
+		?><div id="message" class="updated fade"><p><?php _e('Settings Saved.', 'tos'); ?></p></div><?php
 	}
+	
+	if (is_multisite())
+    $tos_content = get_site_option('signup_tos_data');
+  else
+    $tos_content = get_option('signup_tos_data');
+	?>
+  <h2><?php _e('Terms of Service', 'tos') ?></h2>
+  <form method="post" action="">
+  <table class="form-table">
+  <tr valign="top">
+  <th scope="row"><?php _e('TOS Content: (HTML allowed)', 'tos') ?></th>
+  <td>
+  <textarea name="signup_tos_data" type="text" rows="5" wrap="soft" id="signup_tos_data" style="width: 95%"/><?php echo esc_attr($tos_content); ?></textarea>
+  <br /></td>
+  </tr>
+  </table>
+  
+  <p class="submit">
+  <input type="submit" name="Submit" value="<?php _e('Save Changes', 'tos') ?>" />
+  </p>
+  </form>
+  <?php
+
 	echo '</div>';
 }
 
