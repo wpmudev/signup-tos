@@ -5,6 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+1.2.0 - 07/13/2010 - Aaron Edwards
+----------------------------------------------------------------------
+- Switched from textarea to inline-styled div to support html content
+- Fixed slashes bug when entering quotes
+- Full i18n: Place language file in the mu-plugins folder and name it "tos-LOCALE.mo"
+
 1.1.0 - 06/01/2010
 ----------------------------------------------------------------------
 - 3.0+ compatibility update
