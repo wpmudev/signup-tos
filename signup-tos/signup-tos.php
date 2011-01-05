@@ -3,13 +3,15 @@
 Plugin Name: Signup TOS
 Plugin URI: http://premium.wpmudev.org/project/terms-of-service
 Description: This plugin places a Terms of Service box on the WP Multisite or BuddyPress signup form forcing the user to tick the associated checkbox in order to continue
-Author: Andrew Billits & Aaron Edwards
+Author: Andrew Billits & Aaron Edwards (Incsub)
 Version: 1.2.0
+Author URI: http://premium.wpmudev.org
+Network: true
 WDP ID: 8
 */
 
 /* 
-Copyright 2007-2009 Incsub (http://incsub.com)
+Copyright 2007-2011 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
@@ -28,11 +30,13 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //------------------------------------------------------------------------//
 //---Hook-----------------------------------------------------------------//
 //------------------------------------------------------------------------//
+
 add_action('signup_extra_fields', 'signup_tos_field_wpmu');
 add_action('bp_after_account_details_fields', 'signup_tos_field_bp');
 add_filter('wpmu_validate_user_signup', 'signup_tos_filter_wpmu');
 add_filter('bp_signup_validate', 'signup_tos_filter_bp');
 add_action('admin_menu', 'signup_tos_plug_pages');
+add_action('network_admin_menu', 'signup_tos_plug_pages');
 add_action('plugins_loaded', 'signup_tos_localization');
 
 //------------------------------------------------------------------------//
@@ -42,16 +46,17 @@ add_action('plugins_loaded', 'signup_tos_localization');
 function signup_tos_localization() {
   // Load up the localization file if we're using WordPress in a different language
 	// Place it in the mu-plugins folder or plugins and name it "tos-LOCALE.mo"
-	if (is_multisite())
-    load_muplugin_textdomain( 'tos' );
-  else
-    load_plugin_textdomain( 'tos' );
+	load_plugin_textdomain( 'tos', false, '/signup-tos/languages/' );
 }
 
 function signup_tos_plug_pages() {
-	global $wpdb, $wp_roles, $current_user;
+	global $wp_version;
 	if ( is_multisite() ) {
-		add_submenu_page('ms-admin.php', __('TOS', 'tos'), __('TOS', 'tos'), 10, 'signup-tos', 'signup_tos_page_main_output');
+  	if ( version_compare($wp_version, '3.0.9', '>') ) {
+      add_submenu_page('settings.php', __('TOS', 'tos'), __('TOS', 'tos'), 'manage_options', 'signup-tos', 'signup_tos_page_main_output');
+    } else {
+      add_submenu_page('ms-admin.php', __('TOS', 'tos'), __('TOS', 'tos'), 'manage_options', 'signup-tos', 'signup_tos_page_main_output');
+    }
 	} else {
     add_options_page(__('TOS', 'tos'), __('TOS', 'tos'), 'manage_options', 'signup-tos', 'signup_tos_page_main_output');
   }
@@ -65,10 +70,9 @@ function signup_tos_field_wpmu($errors) {
 	if (!empty($errors)){
 		$error = $errors->get_error_message('tos');
 	}
-  if (is_multisite())
-    $signup_tos = get_site_option('signup_tos_data');
-  else
-    $signup_tos = get_option('signup_tos_data');
+
+  $signup_tos = get_site_option('signup_tos_data');
+
 	if ( !empty( $signup_tos ) ) {
 	?>
     <label for="tos_content"><?php _e('Terms Of Service', 'tos'); ?>:</label>
@@ -85,10 +89,7 @@ function signup_tos_field_wpmu($errors) {
 }
 
 function signup_tos_field_bp() {
-  if (is_multisite())
-    $signup_tos = get_site_option('signup_tos_data');
-  else
-    $signup_tos = get_option('signup_tos_data');
+  $signup_tos = get_site_option('signup_tos_data');
 	if ( !empty( $signup_tos ) ) {
 	?>
     <div class="register-section" id="blog-details-section">
@@ -125,10 +126,8 @@ function signup_tos_filter_wpmu($content) {
 
 function signup_tos_filter_bp() {
 	global $bp;
-  if (is_multisite())
-    $signup_tos = get_site_option('signup_tos_data');
-  else
-    $signup_tos = get_option('signup_tos_data');
+  $signup_tos = get_site_option('signup_tos_data');
+
 	if ( !empty( $signup_tos ) ) {
 		$tos_agree = (int) $_POST['tos_agree'];
 		if($tos_agree == '0' && isset($_POST['signup_username'])) {
@@ -148,24 +147,19 @@ function signup_tos_filter_bp() {
 function signup_tos_page_main_output() {
 	global $wpdb, $wp_roles, $current_user;
 
-	if((is_multisite() && !is_super_admin()) || !current_user_can('manage_options')) {
+	if( !current_user_can('edit_users') ) {
 		echo "<p>Nice Try...</p>";  //If accessed properly, this message doesn't appear.
 		return;
 	}
 
 	echo '<div class="wrap">';
 	if (isset($_POST['signup_tos_data'])) {
-    if (is_multisite())
-      update_site_option( "signup_tos_data", stripslashes($_POST['signup_tos_data']) );
-    else
-      update_option( "signup_tos_data", stripslashes($_POST['signup_tos_data']) );
+    update_site_option( "signup_tos_data", stripslashes($_POST['signup_tos_data']) );
 		?><div id="message" class="updated fade"><p><?php _e('Settings Saved.', 'tos'); ?></p></div><?php
 	}
 	
-	if (is_multisite())
-    $tos_content = get_site_option('signup_tos_data');
-  else
-    $tos_content = get_option('signup_tos_data');
+	$tos_content = get_site_option('signup_tos_data');
+
 	?>
   <h2><?php _e('Terms of Service', 'tos') ?></h2>
   <form method="post" action="">
@@ -187,4 +181,16 @@ function signup_tos_page_main_output() {
 	echo '</div>';
 }
 
+
+///////////////////////////////////////////////////////////////////////////
+/* -------------------- Update Notifications Notice -------------------- */
+if ( !function_exists( 'wdp_un_check' ) ) {
+  add_action( 'admin_notices', 'wdp_un_check', 5 );
+  add_action( 'network_admin_notices', 'wdp_un_check', 5 );
+  function wdp_un_check() {
+    if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'edit_users' ) )
+      echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', 'wpmudev') . '</a></p></div>';
+  }
+}
+/* --------------------------------------------------------------------- */
 ?>
