@@ -4,13 +4,13 @@ Plugin Name: Signup TOS
 Plugin URI: http://premium.wpmudev.org/project/terms-of-service
 Description: This plugin places a Terms of Service box on the WP Multisite or BuddyPress signup form forcing the user to tick the associated checkbox in order to continue
 Author: Andrew Billits & Aaron Edwards (Incsub)
-Version: 1.2.1
+Version: 1.2.2
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 8
 */
 
-/* 
+/*
 Copyright 2007-2011 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //------------------------------------------------------------------------//
 
 add_action('signup_extra_fields', 'signup_tos_field_wpmu');
-add_action('bp_after_account_details_fields', 'signup_tos_field_bp');
+add_action('bp_before_registration_submit_buttons', 'signup_tos_field_bp');
 add_filter('wpmu_validate_user_signup', 'signup_tos_filter_wpmu');
 add_filter('bp_signup_validate', 'signup_tos_filter_bp');
 add_action('admin_menu', 'signup_tos_plug_pages');
@@ -112,7 +112,7 @@ function signup_tos_filter_wpmu($content) {
 		if($tos_agree == '0' && $_POST['stage'] == 'validate-user-signup') {
 			$content['errors']->add('tos', __('You must agree to the TOS in order to signup.', 'tos'));
 		}
-	
+
 		if($tos_agree == '1') {
 			//correct answer!
 		} else {
@@ -133,7 +133,7 @@ function signup_tos_filter_bp() {
 		if($tos_agree == '0' && isset($_POST['signup_username'])) {
 			$bp->signup->errors['tos_agree'] = __( 'You must agree to the TOS in order to signup.', 'tos' );
 		}
-	
+
 		if($tos_agree == '1') {
 			//correct answer!
 		} else {
@@ -157,7 +157,7 @@ function signup_tos_page_main_output() {
     update_site_option( "signup_tos_data", stripslashes($_POST['signup_tos_data']) );
 		?><div id="message" class="updated fade"><p><?php _e('Settings Saved.', 'tos'); ?></p></div><?php
 	}
-	
+
 	$tos_content = get_site_option('signup_tos_data');
 
 	?>
@@ -171,7 +171,7 @@ function signup_tos_page_main_output() {
   <br /></td>
   </tr>
   </table>
-  
+
   <p class="submit">
   <input type="submit" name="Submit" value="<?php _e('Save Changes', 'tos') ?>" />
   </p>
