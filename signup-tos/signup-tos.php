@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //---Hook-----------------------------------------------------------------//
 //------------------------------------------------------------------------//
 
-add_action('signup_extra_fields', 'signup_tos_field_wpmu');
+add_action('signup_extra_fields', 'signup_tos_field_wpmu', 20);
 add_action('bp_before_registration_submit_buttons', 'signup_tos_field_bp');
 add_filter('wpmu_validate_user_signup', 'signup_tos_filter_wpmu');
 add_filter('bp_signup_validate', 'signup_tos_filter_bp');
@@ -52,11 +52,7 @@ function signup_tos_localization() {
 function signup_tos_plug_pages() {
 	global $wp_version;
 	if ( is_multisite() ) {
-  	if ( version_compare($wp_version, '3.0.9', '>') ) {
-      add_submenu_page('settings.php', __('TOS', 'tos'), __('TOS', 'tos'), 'manage_options', 'signup-tos', 'signup_tos_page_main_output');
-    } else {
-      add_submenu_page('ms-admin.php', __('TOS', 'tos'), __('TOS', 'tos'), 'manage_options', 'signup-tos', 'signup_tos_page_main_output');
-    }
+  	add_submenu_page('settings.php', __('TOS', 'tos'), __('TOS', 'tos'), 'manage_network_options', 'signup-tos', 'signup_tos_page_main_output');
 	} else {
     add_options_page(__('TOS', 'tos'), __('TOS', 'tos'), 'manage_options', 'signup-tos', 'signup_tos_page_main_output');
   }
