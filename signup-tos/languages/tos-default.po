@@ -2,66 +2,56 @@ msgid ""
 msgstr ""
 "Project-Id-Version: signup-tos\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-07 17:06-0600\n"
-"PO-Revision-Date: 2011-01-07 17:06-0600\n"
-"Last-Translator: Aaron Edwards <aaron@uglyrobot.com>\n"
+"POT-Creation-Date: 2013-03-13 17:00-0600\n"
+"PO-Revision-Date: 2013-03-13 17:00-0600\n"
+"Last-Translator: Aaron Edwards\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: __;_e;_n;_x\n"
 "X-Poedit-Basepath: .\n"
-"X-Poedit-SearchPath-0: C:\\Users\\Aaron\\Desktop\\UglyRobot Projects\\Incsub\\signup-tos\n"
+"X-Poedit-SearchPath-0: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos\n"
 
-#: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:56
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:58
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:61
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:55
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:57
 msgid "TOS"
 msgstr ""
 
-#: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:78
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:96
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:74
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:92
 msgid "Terms Of Service"
 msgstr ""
 
-#: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:86
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:99
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:82
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:95
 msgid "I Agree"
 msgstr ""
 
-#: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:113
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:120
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:134
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:141
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:109
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:116
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:130
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:137
 msgid "You must agree to the TOS in order to signup."
 msgstr ""
 
-#: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:158
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:154
 msgid "Settings Saved."
 msgstr ""
 
-#: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:164
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:160
 msgid "Terms of Service"
 msgstr ""
 
-#: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:168
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:164
 msgid "TOS Content: (HTML allowed)"
 msgstr ""
 
-#: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:176
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:172
 msgid "Save Changes"
 msgstr ""
 
-#: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\signup-tos/signup-tos/signup-tos.php:192
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:188
 msgid "Please install the latest version of <a href=\"http://premium.wpmudev.org/project/update-notifications/\" title=\"Download Now &raquo;\">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href=\"http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/\">More information &raquo;</a>"
 msgstr ""
 
