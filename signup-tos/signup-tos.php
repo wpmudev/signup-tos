@@ -68,14 +68,17 @@ function signup_tos_shortcode($atts) {
 		'checkbox' => 0,
 	), $atts));
 	
-	if ($checkbox) {
-		ob_start();
-		signup_tos_field_wpmu('');
-		return ob_get_flush();
-	} else {
-		return '<label for="tos_content">' . __('Terms Of Service', 'tos') . ':</label>
-    <div id="tos_content" style="height:150px;width:95%;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;">' . $signup_tos . '</div>';
+	$signup_tos = get_site_option('signup_tos_data');
+	if ( empty($signup_tos) ) {
+		return '';
 	}
+	
+	$html = '<label for="tos_content">' . __('Terms Of Service', 'tos') . ':</label>
+    <div id="tos_content" style="height:150px;width:95%;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;">' . $signup_tos . '</div>';
+	if ($checkbox) {
+		$html .= '<label for="tos_agree"><input type="checkbox" id="tos_agree" name="tos_agree" value="1" /> ' . __('I Agree', 'tos') . '</label>';
+	}
+	return $html;
 }
 
 function signup_tos_field_wpmu($errors) {
@@ -174,8 +177,9 @@ function signup_tos_page_main_output() {
 
 	?>
   <h2><?php _e('Terms of Service', 'tos') ?></h2>
-	<span class="description"><?php _e('Please enter the text for your Terms of Service here. It will be displayed on the multisite wp-signup.php page or BuddyPress registration form. You may also use the shortcode [signup-tos] in your posts or pages. Note that You can enable the checkbox (though it won\'t be functional) by adding the appropriate argument to the shortcode like [signup-tos checkbox="1"].', 'tos') ?></span>
-  <form method="post" action="">
+	<p><span class="description"><?php _e('Please enter the text for your Terms of Service here. It will be displayed on the multisite wp-signup.php page or BuddyPress registration form. You may also use the shortcode [signup-tos] in your posts or pages. Note that You can enable the checkbox (though it won\'t be functional) by adding the appropriate argument to the shortcode like [signup-tos checkbox="1"].', 'tos') ?></span>
+  </p>
+	<form method="post" action="">
   <table class="form-table">
   <tr valign="top">
   <th scope="row"><?php _e('TOS Content: (HTML allowed)', 'tos') ?></th>
@@ -185,9 +189,9 @@ function signup_tos_page_main_output() {
   </tr>
   </table>
 
-  <p class="submit">
-  <input type="submit" name="Submit" value="<?php _e('Save Changes', 'tos') ?>" />
-  </p>
+	<p class="submit">
+	<input type="submit" class="button-primary" name="save_settings" value="<?php _e('Save Changes', 'tos') ?>" />
+	</p>
   </form>
   <?php
 
