@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: signup-tos\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-13 17:00-0600\n"
-"PO-Revision-Date: 2013-03-13 17:00-0600\n"
+"POT-Creation-Date: 2013-09-27 15:52-0600\n"
+"PO-Revision-Date: 2013-09-27 15:52-0600\n"
 "Last-Translator: Aaron Edwards\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -13,45 +13,56 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos\n"
 
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:55
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:57
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:56
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:58
 msgid "TOS"
 msgstr ""
 
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:74
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:92
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:76
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:90
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:108
 msgid "Terms Of Service"
 msgstr ""
 
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:82
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:95
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:98
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:111
 msgid "I Agree"
 msgstr ""
 
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:109
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:116
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:130
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:137
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:125
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:132
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:146
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:153
 msgid "You must agree to the TOS in order to signup."
 msgstr ""
 
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:154
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:170
 msgid "Settings Saved."
 msgstr ""
 
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:160
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:176
 msgid "Terms of Service"
 msgstr ""
 
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:164
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:177
+msgid "Please enter the text for your Terms of Service here. It will be displayed on the multisite wp-signup.php page or BuddyPress registration form. You may also use the shortcode [signup-tos] in your posts or pages. Note that You can enable the checkbox (though it won't be functional) by adding the appropriate argument to the shortcode like [signup-tos checkbox=\"1\"]."
+msgstr ""
+
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:181
 msgid "TOS Content: (HTML allowed)"
 msgstr ""
 
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:172
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:189
 msgid "Save Changes"
 msgstr ""
 
-#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/signup-tos.php:188
-msgid "Please install the latest version of <a href=\"http://premium.wpmudev.org/project/update-notifications/\" title=\"Download Now &raquo;\">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href=\"http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/\">More information &raquo;</a>"
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/dash-notice/wpmudev-dash-notification.php:57
+#, php-format
+msgid "Easily get updates, support, and one-click WPMU DEV plugin/theme installations right from in your dashboard - <strong><a href=\"%s\" title=\"Install Now &raquo;\">install the free WPMU DEV Dashboard plugin</a></strong>. &nbsp;&nbsp;&nbsp;<small><a href=\"http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/\">(find out more)</a></small>"
+msgstr ""
+
+#: /Users/aaron2/Documents/incsub-plugins/signup-tos/signup-tos/dash-notice/wpmudev-dash-notification.php:61
+#, php-format
+msgid "Updates, Support, Premium Plugins, Community - <strong><a href=\"%s\" title=\"Activate Now &raquo;\">activate the WPMU DEV Dashboard plugin now</a></strong>."
 msgstr ""
 
