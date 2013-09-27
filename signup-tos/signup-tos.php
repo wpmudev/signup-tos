@@ -4,7 +4,7 @@ Plugin Name: Signup TOS
 Plugin URI: http://premium.wpmudev.org/project/terms-of-service
 Description: This plugin places a Terms of Service box on the WP Multisite or BuddyPress signup form forcing the user to tick the associated checkbox in order to continue
 Author: Andrew Billits & Aaron Edwards (Incsub)
-Version: 1.2.3
+Version: 1.3
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 8
@@ -38,6 +38,7 @@ add_filter('bp_signup_validate', 'signup_tos_filter_bp');
 add_action('admin_menu', 'signup_tos_plug_pages');
 add_action('network_admin_menu', 'signup_tos_plug_pages');
 add_action('plugins_loaded', 'signup_tos_localization');
+add_shortcode('signup-tos', 'signup_tos_shortcode');
 
 //------------------------------------------------------------------------//
 //---Functions------------------------------------------------------------//
@@ -62,6 +63,21 @@ function signup_tos_plug_pages() {
 //---Page Output Functions------------------------------------------------//
 //------------------------------------------------------------------------//
 
+function signup_tos_shortcode($atts) {
+	extract(shortcode_atts(array(
+		'checkbox' => 0,
+	), $atts));
+	
+	if ($checkbox) {
+		ob_start();
+		signup_tos_field_wpmu('');
+		return ob_get_flush();
+	} else {
+		return '<label for="tos_content">' . __('Terms Of Service', 'tos') . ':</label>
+    <div id="tos_content" style="height:150px;width:95%;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;">' . $signup_tos . '</div>';
+	}
+}
+
 function signup_tos_field_wpmu($errors) {
 	if (!empty($errors)){
 		$error = $errors->get_error_message('tos');
@@ -75,9 +91,9 @@ function signup_tos_field_wpmu($errors) {
     <div id="tos_content" style="height:150px;width:95%;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;"><?php echo $signup_tos ?></div>
 
 		<?php
-        if(!empty($error)) {
+    if(!empty($error)) {
 			echo '<p class="error">' . $error . '</p>';
-        }
+    }
 		?>
 		<label for="tos_agree"><input type="checkbox" id="tos_agree" name="tos_agree" value="1" /> <?php _e('I Agree', 'tos'); ?></label>
 	<?php
@@ -158,6 +174,7 @@ function signup_tos_page_main_output() {
 
 	?>
   <h2><?php _e('Terms of Service', 'tos') ?></h2>
+	<span class="description"><?php _e('Please enter the text for your Terms of Service here. It will be displayed on the multisite wp-signup.php page or BuddyPress registration form. You may also use the shortcode [signup-tos] in your posts or pages. Note that You can enable the checkbox (though it won\'t be functional) by adding the appropriate argument to the shortcode like [signup-tos checkbox="1"].', 'tos') ?></span>
   <form method="post" action="">
   <table class="form-table">
   <tr valign="top">
@@ -177,16 +194,4 @@ function signup_tos_page_main_output() {
 	echo '</div>';
 }
 
-
-///////////////////////////////////////////////////////////////////////////
-/* -------------------- Update Notifications Notice -------------------- */
-if ( !function_exists( 'wdp_un_check' ) ) {
-  add_action( 'admin_notices', 'wdp_un_check', 5 );
-  add_action( 'network_admin_notices', 'wdp_un_check', 5 );
-  function wdp_un_check() {
-    if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'edit_users' ) )
-      echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', 'wpmudev') . '</a></p></div>';
-  }
-}
-/* --------------------------------------------------------------------- */
-?>
+include_once( dirname( __FILE__ ) . '/dash-notice/wpmudev-dash-notification.php' );
