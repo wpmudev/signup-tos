@@ -63,44 +63,40 @@ function signup_tos_plug_pages() {
 //---Page Output Functions------------------------------------------------//
 //------------------------------------------------------------------------//
 
-function signup_tos_shortcode($atts) {
-	extract(shortcode_atts(array(
+function signup_tos_shortcode( $atts ) {
+	extract( shortcode_atts( array(
 		'checkbox' => 0,
-	), $atts));
-	
-	$signup_tos = get_site_option('signup_tos_data');
-	if ( empty($signup_tos) ) {
+		'error'    => '',
+	), $atts ) );
+
+	$signup_tos = get_site_option( 'signup_tos_data' );
+	if ( empty( $signup_tos ) ) {
 		return '';
 	}
-	
-	$html = '<label for="tos_content">' . __('Terms Of Service', 'tos') . ':</label>
-    <div id="tos_content" style="height:150px;width:95%;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;">' . $signup_tos . '</div>';
-	if ($checkbox) {
-		$html .= '<label for="tos_agree"><input type="checkbox" id="tos_agree" name="tos_agree" value="1" /> ' . __('I Agree', 'tos') . '</label>';
-	}
-	return $html;
+
+	ob_start();
+
+	?><label for="tos_content"><?php _e( 'Terms Of Service', 'tos' ) ?>:</label>
+	<div id="tos_content" style="height:150px;width:95%;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;"><?php echo wpautop( $signup_tos ) ?></div>
+
+	<?php if ( !empty( $error ) ) : ?>
+	<p class="error"><?php echo $error ?></p>
+	<?php endif; ?>
+
+	<input type="hidden" name="tos_agree" value="0">
+	<label>
+		<input type="checkbox" id="tos_agree" name="tos_agree" value="1" style="width:auto;display:inline">
+		<?php _e( 'I Agree', 'tos' ) ?>
+	</label><?php
+
+	return ob_get_clean();
 }
 
-function signup_tos_field_wpmu($errors) {
-	if (!empty($errors)){
-		$error = $errors->get_error_message('tos');
-	}
-
-  $signup_tos = get_site_option('signup_tos_data');
-
-	if ( !empty( $signup_tos ) ) {
-	?>
-    <label for="tos_content"><?php _e('Terms Of Service', 'tos'); ?>:</label>
-    <div id="tos_content" style="height:150px;width:95%;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;"><?php echo $signup_tos ?></div>
-
-		<?php
-    if(!empty($error)) {
-			echo '<p class="error">' . $error . '</p>';
-    }
-		?>
-		<label for="tos_agree"><input type="checkbox" id="tos_agree" name="tos_agree" value="1" /> <?php _e('I Agree', 'tos'); ?></label>
-	<?php
-	}
+function signup_tos_field_wpmu( $errors ) {
+	echo signup_tos_shortcode( array(
+		'checkbox' => true,
+		'error'    => !empty( $errors ) ? $errors->get_error_message( 'tos' ) : '',
+	) );
 }
 
 function signup_tos_field_bp() {
@@ -160,42 +156,40 @@ function signup_tos_filter_bp() {
 }
 
 function signup_tos_page_main_output() {
-	global $wpdb, $wp_roles, $current_user;
-
-	if( !current_user_can('edit_users') ) {
+	if ( !current_user_can( 'edit_users' ) ) {
 		echo "<p>Nice Try...</p>";  //If accessed properly, this message doesn't appear.
 		return;
 	}
 
-	echo '<div class="wrap">';
-	if (isset($_POST['signup_tos_data'])) {
-    update_site_option( "signup_tos_data", stripslashes($_POST['signup_tos_data']) );
-		?><div id="message" class="updated fade"><p><?php _e('Settings Saved.', 'tos'); ?></p></div><?php
+	// update message if posted
+	$message = '';
+	if ( $_SERVER['REQUEST_METHOD'] == 'POST' && isset( $_POST['signup_tos_data'] ) ) {
+		update_site_option( "signup_tos_data", wp_filter_kses( stripslashes( trim( $_POST['signup_tos_data'] ) ) ) );
+		$message = esc_html__( 'Settings Saved.', 'tos' );
 	}
 
-	$tos_content = get_site_option('signup_tos_data');
+	// render page
+	?><div class="wrap">
+		<h2><?php _e( 'Terms of Service', 'tos' ) ?></h2>
 
-	?>
-  <h2><?php _e('Terms of Service', 'tos') ?></h2>
-	<p><span class="description"><?php _e('Please enter the text for your Terms of Service here. It will be displayed on the multisite wp-signup.php page or BuddyPress registration form. You may also use the shortcode [signup-tos] in your posts or pages. Note that You can enable the checkbox (though it won\'t be functional) by adding the appropriate argument to the shortcode like [signup-tos checkbox="1"].', 'tos') ?></span>
-  </p>
-	<form method="post" action="">
-  <table class="form-table">
-  <tr valign="top">
-  <th scope="row"><?php _e('TOS Content: (HTML allowed)', 'tos') ?></th>
-  <td>
-  <textarea name="signup_tos_data" type="text" rows="5" wrap="soft" id="signup_tos_data" style="width: 95%"/><?php echo esc_attr($tos_content); ?></textarea>
-  <br /></td>
-  </tr>
-  </table>
+		<?php if ( !empty( $message ) ) : ?>
+		<div id="message" class="updated fade"><p><?php echo $message ?></p></div>
+		<?php endif; ?>
 
-	<p class="submit">
-	<input type="submit" class="button-primary" name="save_settings" value="<?php _e('Save Changes', 'tos') ?>" />
-	</p>
-  </form>
-  <?php
+		<p class="description"><?php
+			_e( 'Please enter the text for your Terms of Service here. It will be displayed on the multisite wp-signup.php page or BuddyPress registration form. You may also use the shortcode [signup-tos] in your posts or pages. Note that You can enable the checkbox (though it won\'t be functional) by adding the appropriate argument to the shortcode like [signup-tos checkbox="1"].', 'tos' )
+		?></p>
 
-	echo '</div>';
+		<br>
+
+		<form method="post">
+			<?php wp_editor( get_site_option( 'signup_tos_data' ), 'signuptosdata', array( 'textarea_name' => 'signup_tos_data' ) ) ?>
+
+			<p class="submit">
+				<input type="submit" class="button-primary" name="save_settings" value="<?php _e( 'Save Changes', 'tos' ) ?>">
+			</p>
+		</form>
+	</div><?php
 }
 
 include_once( dirname( __FILE__ ) . '/dash-notice/wpmudev-dash-notification.php' );
