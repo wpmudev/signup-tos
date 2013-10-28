@@ -31,14 +31,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //---Hook-----------------------------------------------------------------//
 //------------------------------------------------------------------------//
 
-add_action('signup_extra_fields', 'signup_tos_field_wpmu', 20);
-add_action('bp_before_registration_submit_buttons', 'signup_tos_field_bp');
-add_filter('wpmu_validate_user_signup', 'signup_tos_filter_wpmu');
-add_filter('bp_signup_validate', 'signup_tos_filter_bp');
-add_action('admin_menu', 'signup_tos_plug_pages');
-add_action('network_admin_menu', 'signup_tos_plug_pages');
-add_action('plugins_loaded', 'signup_tos_localization');
-add_shortcode('signup-tos', 'signup_tos_shortcode');
+add_action( 'signup_extra_fields', 'signup_tos_field_wpmu', 20 );
+add_action( 'bp_before_registration_submit_buttons', 'signup_tos_field_bp' );
+add_filter( 'wpmu_validate_user_signup', 'signup_tos_filter_wpmu' );
+add_filter( 'bp_signup_validate', 'signup_tos_filter_bp' );
+add_action( 'admin_menu', 'signup_tos_plug_pages' );
+add_action( 'network_admin_menu', 'signup_tos_plug_pages' );
+add_action( 'plugins_loaded', 'signup_tos_localization' );
+add_shortcode( 'signup-tos', 'signup_tos_shortcode' );
 
 //------------------------------------------------------------------------//
 //---Functions------------------------------------------------------------//
@@ -51,12 +51,15 @@ function signup_tos_localization() {
 }
 
 function signup_tos_plug_pages() {
-	global $wp_version;
+	$title = __( 'TOS', 'tos' );
+	$slug = 'signup-tos';
+	$callback = 'signup_tos_page_main_output';
+
 	if ( is_multisite() ) {
-  	add_submenu_page('settings.php', __('TOS', 'tos'), __('TOS', 'tos'), 'manage_network_options', 'signup-tos', 'signup_tos_page_main_output');
+		add_submenu_page( 'settings.php', $title, $title, 'manage_network_options', $slug, $callback );
 	} else {
-    add_options_page(__('TOS', 'tos'), __('TOS', 'tos'), 'manage_options', 'signup-tos', 'signup_tos_page_main_output');
-  }
+		add_options_page( $title, $title, 'manage_options', $slug, $callback );
+	}
 }
 
 //------------------------------------------------------------------------//
@@ -65,8 +68,9 @@ function signup_tos_plug_pages() {
 
 function signup_tos_shortcode( $atts ) {
 	extract( shortcode_atts( array(
-		'checkbox' => 0,
-		'error'    => '',
+		'checkbox'   => 0,
+		'show_label' => 1,
+		'error'      => '',
 	), $atts ) );
 
 	$signup_tos = get_site_option( 'signup_tos_data' );
@@ -76,8 +80,11 @@ function signup_tos_shortcode( $atts ) {
 
 	ob_start();
 
-	?><label for="tos_content"><?php _e( 'Terms Of Service', 'tos' ) ?>:</label>
-	<div id="tos_content" style="height:150px;width:95%;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;"><?php echo wpautop( $signup_tos ) ?></div>
+	if ( $show_label ) : ?>
+		<label for="tos_content"><?php _e( 'Terms Of Service', 'tos' ) ?>:</label>
+	<?php endif; ?>
+
+	<div id="tos_content" style="height:150px;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;"><?php echo wpautop( $signup_tos ) ?></div>
 
 	<?php if ( !empty( $error ) ) : ?>
 	<p class="error"><?php echo $error ?></p>
@@ -85,7 +92,7 @@ function signup_tos_shortcode( $atts ) {
 
 	<input type="hidden" name="tos_agree" value="0">
 	<label>
-		<input type="checkbox" id="tos_agree" name="tos_agree" value="1" style="width:auto;display:inline">
+		<input type="checkbox" id="tos_agree" name="tos_agree" value="1"<?php checked( filter_input( INPUT_POST, 'tos_agree', FILTER_VALIDATE_BOOLEAN ) ) ?> style="width:auto;display:inline">
 		<?php _e( 'I Agree', 'tos' ) ?>
 	</label><?php
 
@@ -93,9 +100,15 @@ function signup_tos_shortcode( $atts ) {
 }
 
 function signup_tos_field_wpmu( $errors ) {
+	// render error message if Membership plugin not exists otherwise Membership
+	// plugin will use it's own errors rendering approach
+	$message = !empty( $errors ) && !class_exists( 'Membership_Plugin', false )
+		? $errors->get_error_message( 'tos' )
+		: '';
+
 	echo signup_tos_shortcode( array(
 		'checkbox' => true,
-		'error'    => !empty( $errors ) ? $errors->get_error_message( 'tos' ) : '',
+		'error'    => $message,
 	) );
 }
 
@@ -113,45 +126,33 @@ function signup_tos_field_bp() {
 	}
 }
 
-function signup_tos_filter_wpmu($content) {
-  if (is_multisite())
-    $signup_tos = get_site_option('signup_tos_data');
-  else
-    $signup_tos = get_option('signup_tos_data');
-	if ( !empty( $signup_tos ) ) {
-		$tos_agree = (int) $_POST['tos_agree'];
-		if($tos_agree == '0' && $_POST['stage'] == 'validate-user-signup') {
-			$content['errors']->add('tos', __('You must agree to the TOS in order to signup.', 'tos'));
-		}
+function signup_tos_filter_wpmu( $errors ) {
+	if ( $_SERVER['REQUEST_METHOD'] != 'POST' || !isset( $_POST['tos_agree'] ) ) {
+		return $errors;
+	}
 
-		if($tos_agree == '1') {
-			//correct answer!
-		} else {
-			if($_POST['stage'] == 'validate-user-signup') {
-				$content['errors']->add('tos', __('You must agree to the TOS in order to signup.', 'tos'));
-			}
+	$signup_tos = get_site_option( 'signup_tos_data' );
+	if ( !empty( $signup_tos ) && (int)$_POST['tos_agree'] == 0 ) {
+		$message = __( 'You must agree to the TOS in order to signup.', 'tos' );
+		if ( is_array( $errors ) && isset( $errors['errors'] ) && is_wp_error( $errors['errors'] ) ) {
+			$errors['errors']->add( 'tos', $message );
+		} elseif ( is_wp_error( $errors ) ) {
+			$errors->add( 'tos', $message );
 		}
 	}
-	return $content;
+
+	return $errors;
 }
 
 function signup_tos_filter_bp() {
 	global $bp;
-  $signup_tos = get_site_option('signup_tos_data');
+	if ( !is_object( $bp ) || !is_a( $bp, 'BuddyPress' ) || $_SERVER['REQUEST_METHOD'] != 'POST' || !isset( $_POST['tos_agree'] ) ) {
+		return;
+	}
 
-	if ( !empty( $signup_tos ) ) {
-		$tos_agree = (int) $_POST['tos_agree'];
-		if($tos_agree == '0' && isset($_POST['signup_username'])) {
-			$bp->signup->errors['tos_agree'] = __( 'You must agree to the TOS in order to signup.', 'tos' );
-		}
-
-		if($tos_agree == '1') {
-			//correct answer!
-		} else {
-			if(isset($_POST['signup_username'])) {
-				$bp->signup->errors['tos_agree'] = __( 'You must agree to the TOS in order to signup.', 'tos' );
-			}
-		}
+	$signup_tos = get_site_option( 'signup_tos_data' );
+	if ( !empty( $signup_tos ) && (int)$_POST['tos_agree'] == 0 ) {
+		$bp->signup->errors['tos_agree'] = __( 'You must agree to the TOS in order to signup.', 'tos' );
 	}
 }
 
