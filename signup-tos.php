@@ -14,7 +14,7 @@ Contributors: Umesh Kumar
 /*
 Copyright 2007-2014 Incsub (http://incsub.com)
 Author - Aaron Edwards & Andrew Billits (Incsub)
-Contributo - Umesh Kumar
+Contributor - Umesh Kumar
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
 the Free Software Foundation.
