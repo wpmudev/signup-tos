@@ -8,7 +8,6 @@ Version: 1.3.2
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 8
-Contributors: Umesh Kumar
 */
 
 /*
