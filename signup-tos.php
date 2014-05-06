@@ -3,7 +3,7 @@
 Plugin Name: Signup TOS
 Plugin URI: http://premium.wpmudev.org/project/terms-of-service
 Description: This plugin places a Terms of Service box on the WP Multisite or BuddyPress signup form forcing the user to tick the associated checkbox in order to continue
-Author: Andrew Billits & Aaron Edwards (Incsub)
+Author: WPMU DEV
 Version: 1.3.2
 Author URI: http://premium.wpmudev.org
 Network: true
@@ -13,7 +13,8 @@ Contributors: Umesh Kumar
 
 /*
 Copyright 2007-2014 Incsub (http://incsub.com)
-
+Author - Aaron Edwards & Andrew Billits (Incsub)
+Contributo - Umesh Kumar
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
 the Free Software Foundation.
