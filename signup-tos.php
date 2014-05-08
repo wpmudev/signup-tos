@@ -4,7 +4,7 @@ Plugin Name: Signup TOS
 Plugin URI: http://premium.wpmudev.org/project/terms-of-service
 Description: This plugin places a Terms of Service box on the WP Multisite or BuddyPress signup form forcing the user to tick the associated checkbox in order to continue
 Author: WPMU DEV
-Version: 1.3.2
+Version: 1.3.3
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 8
@@ -186,7 +186,7 @@ function signup_tos_page_main_output() {
 	// update message if posted
 	$message = '';
 	if ( $_SERVER['REQUEST_METHOD'] == 'POST' && isset( $_POST['signup_tos_data'] ) ) {
-		update_site_option( "signup_tos_data", wp_filter_kses( stripslashes( trim( $_POST['signup_tos_data'] ) ) ) );
+		update_site_option( "signup_tos_data", stripslashes( trim( $_POST['signup_tos_data'] ) ) );
 		$message = esc_html__( 'Settings Saved.', 'tos' );
 	}
 
