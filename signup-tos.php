@@ -4,7 +4,7 @@ Plugin Name: Signup TOS
 Plugin URI: http://premium.wpmudev.org/project/terms-of-service
 Description: This plugin places a Terms of Service box on the WP Site, WP Multisite or BuddyPress signup form forcing the user to tick the associated checkbox in order to continue
 Author: WPMU DEV
-Version: 1.3.4
+Version: 1.3.5
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 8
@@ -97,9 +97,9 @@ function signup_tos_shortcode( $atts ) {
 		<label for="tos_content"><?php _e( 'Terms Of Service', 'tos' ) ?>:</label>
 	<?php }
 
-	if ( ! $multisite ) {
+	if( !$multisite ) {
 		$style = "max-height:150px; overflow:auto; padding:10px; font-size:80%;";
-	} else {
+	}else{
 		$style = "background-color:white; border:1px gray inset; font-size:80%; margin-bottom: 10px; max-height:150px; overflow:auto; padding:5px;";
 	} ?>
 	<div id="tos_content" style="<?php echo $style; ?>"><?php echo wpautop( $signup_tos ) ?></div>
@@ -133,8 +133,8 @@ function signup_tos_field_wpmu( $errors ) {
 	           ! class_exists( 'Membership_Plugin', false ) ? $errors->get_error_message( 'tos' ) : '';
 
 	$atts = array(
-		'checkbox' => true,
-		'error'    => $message,
+		'checkbox'  => true,
+		'error'     => $message,
 	);
 	echo signup_tos_shortcode( $atts );
 }
@@ -167,7 +167,7 @@ function signup_tos_field_wp( $errors ) {
 	// plugin will use it's own errors rendering approach
 	$message = ! empty( $errors ) &&
 	           ! class_exists( 'Membership_Plugin', false ) ? $errors->get_error_message( 'tos' ) : '';
-	$atts    = array(
+	$atts = array(
 		'checkbox'  => true,
 		'error'     => $message,
 		'multisite' => false,
@@ -270,4 +270,19 @@ function signup_tos_page_main_output() {
 	</div><?php
 }
 
-include_once( dirname( __FILE__ ) . '/dash-notice/wpmudev-dash-notification.php' );
+if ( is_admin() && file_exists( '/dash-notice/wpmudev-dash-notification.php' ) ) {
+	// Dashboard notification
+	global $wpmudev_notices, $screen;
+	var_dump($screen );
+	if ( ! is_array( $wpmudev_notices ) ) {
+		$wpmudev_notices = array();
+	}
+	$wpmudev_notices[] = array(
+		'id'      => 8,
+		'name'    => 'Signup TOS',
+		'screens' => array(
+			'signup-tos'
+		),
+	);
+	require_once '/dash-notice/wpmudev-dash-notification.php';
+}
