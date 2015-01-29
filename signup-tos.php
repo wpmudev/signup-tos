@@ -97,9 +97,9 @@ function signup_tos_shortcode( $atts ) {
 		<label for="tos_content"><?php _e( 'Terms Of Service', 'tos' ) ?>:</label>
 	<?php }
 
-	if( !$multisite ) {
+	if ( ! $multisite ) {
 		$style = "max-height:150px; overflow:auto; padding:10px; font-size:80%;";
-	}else{
+	} else {
 		$style = "background-color:white; border:1px gray inset; font-size:80%; margin-bottom: 10px; max-height:150px; overflow:auto; padding:5px;";
 	} ?>
 	<div id="tos_content" style="<?php echo $style; ?>"><?php echo wpautop( $signup_tos ) ?></div>
@@ -133,8 +133,8 @@ function signup_tos_field_wpmu( $errors ) {
 	           ! class_exists( 'Membership_Plugin', false ) ? $errors->get_error_message( 'tos' ) : '';
 
 	$atts = array(
-		'checkbox'  => true,
-		'error'     => $message,
+		'checkbox' => true,
+		'error'    => $message,
 	);
 	echo signup_tos_shortcode( $atts );
 }
@@ -167,7 +167,7 @@ function signup_tos_field_wp( $errors ) {
 	// plugin will use it's own errors rendering approach
 	$message = ! empty( $errors ) &&
 	           ! class_exists( 'Membership_Plugin', false ) ? $errors->get_error_message( 'tos' ) : '';
-	$atts = array(
+	$atts    = array(
 		'checkbox'  => true,
 		'error'     => $message,
 		'multisite' => false,
@@ -210,8 +210,8 @@ function signup_tos_filter_bp() {
 	if ( ! is_object( $bp ) || ! is_a( $bp, 'BuddyPress' ) ) {
 		return;
 	}
-	$signup_tos = get_site_option( 'signup_tos_data' );
-	if ( ! empty( $signup_tos ) && (int) $_POST['tos_agree'] == 0 ) {
+	$signup_tos = esc_attr( get_site_option( 'signup_tos_data' ) );
+	if ( ! empty( $signup_tos ) && ( !isset( $_POST['tos_agree'] ) || (int) $_POST['tos_agree'] == 0 ) ) {
 		$bp->signup->errors['tos_agree'] = __( 'You must agree to the Terms of Service in order to signup.', 'tos' );
 	}
 }
@@ -220,8 +220,8 @@ function signup_tos_filter_bp() {
  * Validate TOS for wp
  */
 function signup_tos_validate_wp( $errors ) {
-	$signup_tos = get_site_option( 'signup_tos_data' );
-	if ( ! empty( $signup_tos ) && (int) $_POST['tos_agree'] == 0 ) {
+	$signup_tos = esc_attr( get_site_option( 'signup_tos_data' ) );
+	if ( ! empty( $signup_tos ) && ( !isset( $_POST['tos_agree'] ) || (int) $_POST['tos_agree'] == 0 ) ) {
 		$errors->add( 'tos_agree', __( '<strong>ERROR</strong>: You must agree to the Terms of Service in order to signup.', 'tos' ) );
 	}
 
@@ -273,16 +273,12 @@ function signup_tos_page_main_output() {
 if ( is_admin() && file_exists( '/dash-notice/wpmudev-dash-notification.php' ) ) {
 	// Dashboard notification
 	global $wpmudev_notices, $screen;
-	var_dump($screen );
 	if ( ! is_array( $wpmudev_notices ) ) {
 		$wpmudev_notices = array();
 	}
 	$wpmudev_notices[] = array(
-		'id'      => 8,
-		'name'    => 'Signup TOS',
-		'screens' => array(
-			'signup-tos'
-		),
+		'id'   => 8,
+		'name' => 'Signup TOS'
 	);
 	require_once '/dash-notice/wpmudev-dash-notification.php';
 }
