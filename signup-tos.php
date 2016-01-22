@@ -50,7 +50,7 @@ add_shortcode( 'signup-tos', 'signup_tos_shortcode' );
 function signup_tos_localization() {
 	// Load up the localization file if we're using WordPress in a different language
 	// Place it in the mu-plugins folder or plugins and name it "tos-LOCALE.mo"
-	load_plugin_textdomain( 'tos', false, '/signup-tos/languages/' );
+	load_plugin_textdomain( 'tos', false, WPMU_PLUGIN_DIR . '/signup-tos/languages/' );
 }
 
 /**
@@ -80,31 +80,47 @@ function signup_tos_plug_pages() {
  */
 function signup_tos_shortcode( $atts ) {
 	extract( shortcode_atts( array(
-		'checkbox'   => 0,
+		'checkbox'   => 1,
 		'show_label' => 1,
 		'error'      => '',
 		'multisite'  => true
 	), $atts ) );
 
 	$signup_tos = get_site_option( 'signup_tos_data' );
-	if ( empty( $signup_tos ) ) {
+	$signup_link = get_site_option( 'signup_tos_link' );
+	if ( empty( $signup_tos ) && empty( $signup_link ) ) {
 		return '';
 	}
 
 	ob_start();
 
-	if ( $show_label ) { ?>
-		<label for="tos_content"><?php _e( 'Terms Of Service', 'tos' ) ?>:</label>
-	<?php }
+	if ( $signup_link ) {
+		// Display only the link
+		?>
+		<label for="tos_agree">
+			<a href="<?php echo esc_url( $signup_link ); ?>"><?php _e( 'Terms of Service', 'tos' ); ?></a>
+		</label>
+		<?php
+	}
+	else {
+		// Display the text
+		if ( $show_label ) {
+			?>
+				<label for="tos_content"><?php _e( 'Terms Of Service', 'tos' ) ?>:</label>
+			<?php
+		}
 
-	if ( ! $multisite ) {
-		$style = "max-height:150px; overflow:auto; padding:10px; font-size:80%;";
-	} else {
-		$style = "background-color:white; border:1px gray inset; font-size:80%; margin-bottom: 10px; max-height:150px; overflow:auto; padding:5px;";
-	} ?>
-	<div id="tos_content" style="<?php echo $style; ?>"><?php echo wpautop( $signup_tos ) ?></div>
+		if ( ! $multisite ) {
+			$style = "max-height:150px; overflow:auto; padding:10px; font-size:80%;";
+		} else {
+			$style = "background-color:white; border:1px gray inset; font-size:80%; margin-bottom: 10px; max-height:150px; overflow:auto; padding:5px;";
+		}
+		?>
+			<div id="tos_content" style="<?php echo $style; ?>"><?php echo wpautop( $signup_tos ) ?></div>
+		<?php
+	}
 
-	<?php if ( ! empty( $error ) ) : ?>
+	if ( ! empty( $error ) ) : ?>
 		<p class="error"><?php echo $error ?></p>
 	<?php endif; ?>
 
@@ -113,8 +129,8 @@ function signup_tos_shortcode( $atts ) {
 		?>
 		<input type="hidden" name="tos_agree" value="0">
 		<label>
-		<input type="checkbox" id="tos_agree" name="tos_agree" value="1" <?php checked( filter_input( INPUT_POST, 'tos_agree', FILTER_VALIDATE_BOOLEAN ) ); ?> style="width:auto;display:inline">
-		<?php _e( 'I Agree', 'tos' ) ?>
+			<input type="checkbox" id="tos_agree" name="tos_agree" value="1" <?php checked( filter_input( INPUT_POST, 'tos_agree', FILTER_VALIDATE_BOOLEAN ) ); ?> style="width:auto;display:inline">
+			<?php _e( 'I Agree', 'tos' ) ?>
 		</label><?php
 	}
 
