@@ -68,6 +68,11 @@ function signup_tos_plug_pages() {
 	}
 }
 
+function signup_tos_is_url( $input ) {
+	$pattern = '/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[.\!\/\\w]*))?)/';
+	return preg_match( $pattern, $input );
+}
+
 //------------------------------------------------------------------------//
 //---Page Output Functions------------------------------------------------//
 //------------------------------------------------------------------------//
@@ -87,19 +92,27 @@ function signup_tos_shortcode( $atts ) {
 	), $atts ) );
 
 	$signup_tos = get_site_option( 'signup_tos_data' );
-	$signup_link = get_site_option( 'signup_tos_link' );
-	if ( empty( $signup_tos ) && empty( $signup_link ) ) {
+	$signup_tos = trim( $signup_tos );
+	if ( empty( $signup_tos ) ) {
 		return '';
 	}
 
+	$is_url = signup_tos_is_url( $signup_tos );
+
 	ob_start();
 
-	if ( $signup_link ) {
+	if ( $is_url ) {
 		// Display only the link
 		?>
+		<input type="hidden" name="tos_agree" value="0">
 		<label for="tos_agree">
-			<a href="<?php echo esc_url( $signup_link ); ?>"><?php _e( 'Terms of Service', 'tos' ); ?></a>
+			<input type="checkbox" id="tos_agree" name="tos_agree" value="1" <?php checked( filter_input( INPUT_POST, 'tos_agree', FILTER_VALIDATE_BOOLEAN ) ); ?> style="width:auto;display:inline">
+			<?php printf( __( 'I agree to the <a target="_blank" href="%s">Terms of Service</a>', 'tos' ), esc_url( $signup_tos ) ); ?>
 		</label>
+
+		<?php if ( ! empty( $error ) ) : ?>
+			<p class="error"><?php echo $error ?></p>
+		<?php endif; ?>
 		<?php
 	}
 	else {
@@ -118,21 +131,23 @@ function signup_tos_shortcode( $atts ) {
 		?>
 			<div id="tos_content" style="<?php echo $style; ?>"><?php echo wpautop( $signup_tos ) ?></div>
 		<?php
-	}
 
-	if ( ! empty( $error ) ) : ?>
-		<p class="error"><?php echo $error ?></p>
-	<?php endif; ?>
+		if ( ! empty( $error ) ) : ?>
+			<p class="error"><?php echo $error ?></p>
+		<?php endif; ?>
 
-	<?php
-	if ( $checkbox ) {
-		?>
-		<input type="hidden" name="tos_agree" value="0">
-		<label>
+		<?php
+		if ( $checkbox ) {
+			?>
+			<input type="hidden" name="tos_agree" value="0">
+			<label>
 			<input type="checkbox" id="tos_agree" name="tos_agree" value="1" <?php checked( filter_input( INPUT_POST, 'tos_agree', FILTER_VALIDATE_BOOLEAN ) ); ?> style="width:auto;display:inline">
 			<?php _e( 'I Agree', 'tos' ) ?>
-		</label><?php
+			</label><?php
+		}
 	}
+
+
 
 	return ob_get_clean();
 }
@@ -256,8 +271,20 @@ function signup_tos_page_main_output() {
 
 	// update message if posted
 	$message = '';
-	if ( $_SERVER['REQUEST_METHOD'] == 'POST' && isset( $_POST['signup_tos_data'] ) ) {
-		update_site_option( "signup_tos_data", stripslashes( trim( $_POST['signup_tos_data'] ) ) );
+	if ( isset( $_POST['save_settings'] ) ) {
+		check_admin_referer( 'save_tos_settings' );
+
+		if ( isset( $_POST['signup_tos_data'] ) ) {
+			update_site_option( "signup_tos_data", stripslashes( trim( $_POST['signup_tos_data'] ) ) );
+		}
+
+		if ( ! isset( $_POST['signup_tos_show_login'] ) ) {
+			update_site_option( "signup_tos_show_login", false );
+		}
+		else {
+			update_site_option( "signup_tos_show_login", true );
+		}
+
 		$message = esc_html__( 'Settings Saved.', 'tos' );
 	}
 
@@ -277,7 +304,26 @@ function signup_tos_page_main_output() {
 	<br>
 
 	<form method="post">
-		<?php wp_editor( get_site_option( 'signup_tos_data' ), 'signuptosdata', array( 'textarea_name' => 'signup_tos_data' ) ) ?>
+		<table class="form-table">
+			<tr>
+				<th scope="row"><label for="signuptosdata"><?php _e( 'Terms of Service', 'tos' ); ?></label></th>
+				<td>
+					<textarea name="signup_tos_data" class="widefat" id="signuptosdata" cols="30" rows="10"><?php echo esc_textarea( get_site_option( 'signup_tos_data' ) ); ?></textarea>
+				</td>
+			</tr>
+
+			<tr>
+				<th scope="row"><?php _e( 'Login form', 'tos' ); ?></th>
+				<td>
+					<label>
+						<input type="checkbox" name="signup_tos_show_login" <?php checked( get_site_option( "signup_tos_show_login" ) ); ?>id="signup_tos_show_login">
+						<?php _e( 'Display a warning in login form', 'tos' ); ?>
+					</label>
+				</td>
+			</tr>
+		</table>
+
+		<?php wp_nonce_field( 'save_tos_settings' ); ?>
 
 		<p class="submit">
 			<input type="submit" class="button-primary" name="save_settings" value="<?php _e( 'Save Changes', 'tos' ) ?>">
@@ -286,15 +332,21 @@ function signup_tos_page_main_output() {
 	</div><?php
 }
 
-if ( is_admin() && file_exists( '/dash-notice/wpmudev-dash-notification.php' ) ) {
-	// Dashboard notification
-	global $wpmudev_notices, $screen;
-	if ( ! is_array( $wpmudev_notices ) ) {
-		$wpmudev_notices = array();
+//========= LOGIN FORM ===============/
+
+/**
+ * @param WP_Error $errors
+ *
+ * @return WP_Error
+ */
+function signup_tos_login_errors( $errors ) {
+	$signup_tos = get_site_option( 'signup_tos_data' );
+	$signup_tos = trim( $signup_tos );
+	if ( signup_tos_is_url( $signup_tos ) && get_site_option( 'signup_tos_show_login' ) ) {
+		$errors->add( 'tos', sprintf( __( 'By logging in, you accept the <a target="_blank" href="%s">Terms of Service</a>' ), $signup_tos ) );
 	}
-	$wpmudev_notices[] = array(
-		'id'   => 8,
-		'name' => 'Signup TOS'
-	);
-	require_once '/dash-notice/wpmudev-dash-notification.php';
+
+	return $errors;
 }
+add_filter( 'wp_login_errors', 'signup_tos_login_errors' );
+
