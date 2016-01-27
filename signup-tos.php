@@ -50,7 +50,7 @@ add_shortcode( 'signup-tos', 'signup_tos_shortcode' );
 function signup_tos_localization() {
 	// Load up the localization file if we're using WordPress in a different language
 	// Place it in the mu-plugins folder or plugins and name it "tos-LOCALE.mo"
-	load_plugin_textdomain( 'tos', false, WPMU_PLUGIN_DIR . '/signup-tos/languages/' );
+	load_plugin_textdomain( 'tos', false, plugin_dir_path( __FILE__ ) . '/signup-tos/languages/' );
 }
 
 /**
