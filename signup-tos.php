@@ -282,3 +282,31 @@ if ( is_admin() && file_exists( '/dash-notice/wpmudev-dash-notification.php' ) )
 	);
 	require_once '/dash-notice/wpmudev-dash-notification.php';
 }
+
+/**
+ * Fix conflct with BP and M2
+ */
+add_filter( 'ms_model_membership_create_new_user_validation_errors', function( $validation_errors, $member ) {
+        if( function_exists( 'buddypress' ) )
+        {
+                $bp = buddypress();
+        }
+        else
+        {
+                $bp = '';
+        }
+
+        if ( ! is_object( $bp ) || ! is_a( $bp, 'BuddyPress' ) ) {
+                return $validation_errors;
+        }
+
+        $signup_tos = esc_attr( get_site_option( 'signup_tos_data' ) );
+	if ( ! empty( $signup_tos ) && ( !isset( $_POST['tos_agree'] ) || (int) $_POST['tos_agree'] == 0 ) ) {
+                $validation_errors->add(
+                        'tos_agree',
+                        __( 'You must agree to the Terms of Service in order to signup.', 'membership2' )
+                );
+        }
+
+        return $validation_errors;
+}, 90, 2);
