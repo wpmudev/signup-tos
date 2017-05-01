@@ -111,9 +111,8 @@ function signup_tos_shortcode( $atts ) {
 	<?php
 	if ( $checkbox ) {
 		?>
-		<input type="hidden" name="tos_agree" value="0">
 		<label>
-		<input type="checkbox" id="tos_agree" name="tos_agree" value="1" <?php checked( filter_input( INPUT_POST, 'tos_agree', FILTER_VALIDATE_BOOLEAN ) ); ?> style="width:auto;display:inline">
+		<input type="checkbox" id="tos_agree" name="tos_agree" value="1" <?php checked( isset( $_POST['tos_agree'] ) ? true : false ); ?> style="width:auto;display:inline">
 		<?php _e( 'I Agree', 'tos' ) ?>
 		</label><?php
 	}
@@ -150,7 +149,7 @@ function signup_tos_field_bp() {
 			<label for="tos_content"><?php _e( 'Terms Of Service', 'tos' ); ?></label>
 			<?php do_action( 'bp_tos_agree_errors' ) ?>
 			<div id="tos_content" style="height:150px;width:100%;overflow:auto;background-color:white;padding:5px;border:1px gray inset;font-size:80%;"><?php echo $signup_tos ?></div>
-			<label for="tos_agree"><input type="checkbox" id="tos_agree" name="tos_agree" value="1" <?php checked( filter_input( INPUT_POST, 'tos_agree', FILTER_VALIDATE_BOOLEAN ) ); ?>/> <?php _e( 'I Agree', 'tos' ); ?>
+			<label for="tos_agree"><input type="checkbox" id="tos_agree" name="tos_agree" value="1" <?php checked( isset( $_POST['tos_agree'] ) ? true : false ); ?>/> <?php _e( 'I Agree', 'tos' ); ?>
 			</label>
 		</div>
 	<?php
@@ -183,18 +182,18 @@ function signup_tos_field_wp( $errors ) {
  * @return type
  */
 function signup_tos_filter_wpmu( $errors ) {
-	if ( $_SERVER['REQUEST_METHOD'] != 'POST' || ! isset( $_POST['tos_agree'] ) ) {
-		return $errors;
-	}
-
 	$signup_tos = get_site_option( 'signup_tos_data' );
-	if ( ! empty( $signup_tos ) && (int) $_POST['tos_agree'] == 0 ) {
-		$message = __( 'You must agree to the Terms of Service in order to signup.', 'tos' );
+	if ( ! empty( $signup_tos ) && (int) $_POST['tos_agree'] == 0  ) {
+		$message = __( 'You must agree to the Terms of Service in order to signup.' . $_POST['tos_agree'], 'tos' );
 		if ( is_array( $errors ) && isset( $errors['errors'] ) && is_wp_error( $errors['errors'] ) ) {
 			$errors['errors']->add( 'tos', $message );
 		} elseif ( is_wp_error( $errors ) ) {
 			$errors->add( 'tos', $message );
 		}
+	}
+
+	if ( $_SERVER['REQUEST_METHOD'] != 'POST' || ! isset( $_POST['tos_agree'] ) ) {
+		return $errors;
 	}
 
 	return $errors;
