@@ -182,18 +182,21 @@ function signup_tos_field_wp( $errors ) {
  * @return type
  */
 function signup_tos_filter_wpmu( $errors ) {
-	$signup_tos = get_site_option( 'signup_tos_data' );
-	if ( ! empty( $signup_tos ) && (int) $_POST['tos_agree'] == 0  ) {
-		$message = __( 'You must agree to the Terms of Service in order to signup.' . $_POST['tos_agree'], 'tos' );
+	
+    $signup_tos = get_site_option( 'signup_tos_data' );
+	$tos_accepted = ! isset( $_POST['tos_agree'] ) || (int) $_POST['tos_agree'] != 1 ? false : true;
+	$signup_step_requires_tos = isset( $_POST['stage'] ) && $_POST['stage'] == 'validate-user-signup';
+
+	if ( ! is_admin() && ! empty( $signup_tos ) && $signup_step_requires_tos && ! $tos_accepted ){
+
+		$message = __( 'You must agree to the Terms of Service in order to signup.', 'tos' );
+
 		if ( is_array( $errors ) && isset( $errors['errors'] ) && is_wp_error( $errors['errors'] ) ) {
 			$errors['errors']->add( 'tos', $message );
 		} elseif ( is_wp_error( $errors ) ) {
 			$errors->add( 'tos', $message );
 		}
-	}
 
-	if ( $_SERVER['REQUEST_METHOD'] != 'POST' || ! isset( $_POST['tos_agree'] ) ) {
-		return $errors;
 	}
 
 	return $errors;
