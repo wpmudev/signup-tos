@@ -183,8 +183,8 @@ function signup_tos_field_wp( $errors ) {
  */
 function signup_tos_filter_wpmu( $errors ) {
 	$signup_tos = get_site_option( 'signup_tos_data' );
-	if ( ! empty( $signup_tos ) && (int) $_POST['tos_agree'] == 0  ) {
-		$message = __( 'You must agree to the Terms of Service in order to signup.' . $_POST['tos_agree'], 'tos' );
+	if ( ! empty( $signup_tos ) && ( ! isset( $_POST['tos_agree'] ) || (int) $_POST['tos_agree'] == 0 ) && 'user-network' !==  get_current_screen()->id ) {
+		$message = __( 'You must agree to the Terms of Service in order to signup.', 'tos' );
 		if ( is_array( $errors ) && isset( $errors['errors'] ) && is_wp_error( $errors['errors'] ) ) {
 			$errors['errors']->add( 'tos', $message );
 		} elseif ( is_wp_error( $errors ) ) {
