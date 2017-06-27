@@ -188,7 +188,7 @@ function signup_tos_filter_wpmu( $errors ) {
 	}
 
 	if ( ! empty( $signup_tos ) && ( ! isset( $_POST['tos_agree'] ) || (int) $_POST['tos_agree'] == 0 ) ) {
-		$message = __( 'You must agree to the Terms of Service in order to signup.' . get_current_screen()->id, 'tos' );
+		$message = __( 'You must agree to the Terms of Service in order to signup.', 'tos' );
 		if ( is_array( $errors ) && isset( $errors['errors'] ) && is_wp_error( $errors['errors'] ) ) {
 			$errors['errors']->add( 'tos', $message );
 		} elseif ( is_wp_error( $errors ) ) {
