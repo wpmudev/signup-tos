@@ -5,6 +5,14 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+1.3.6
+----------------------------------------------------------------------
+- Fix: conflict with M2 and BP
+- Fix: TOS not working on submit
+- Fix: tos issues
+- Fix: tos error on subsite user add
+- Fix: remove debug info
+
 1.3.5 - 29/12/2014 - Umesh Kumar
 ----------------------------------------------------------------------
 - Fixed:    Check shortcode argument to display checkbox
