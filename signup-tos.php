@@ -182,10 +182,16 @@ function signup_tos_field_wp( $errors ) {
  * @return type
  */
 function signup_tos_filter_wpmu( $errors ) {
-	$signup_tos = get_site_option( 'signup_tos_data' );
-	if ( 'user-network' ===  get_current_screen()->id || 'user' === get_current_screen()->id ) {
-		return;
+	
+	$current_screen = function_exists( 'get_current_screen' ) ? get_current_screen() : false;
+	$skip_admin_pages = array( 'user-network', 'user' );
+	$skip_tos_check = ( ! empty( $current_screen ) && in_array( $current_screen->id, $skip_admin_pages ) );
+
+	if ( apply_filters( 'signup_tos/skip_tos_check', $skip_tos_check ) ) {
+		return $errors;
 	}
+
+	$signup_tos = get_site_option( 'signup_tos_data' );
 
 	if ( ! empty( $signup_tos ) && ( ! isset( $_POST['tos_agree'] ) || (int) $_POST['tos_agree'] == 0 ) ) {
 		$message = __( 'You must agree to the Terms of Service in order to signup.', 'tos' );
@@ -196,11 +202,7 @@ function signup_tos_filter_wpmu( $errors ) {
 		}
 	}
 
-	if ( $_SERVER['REQUEST_METHOD'] != 'POST' || ! isset( $_POST['tos_agree'] ) ) {
-		return $errors;
-	}
-
-	return $errors;
+	return apply_filters( 'signup_tos/wpmu_errors', $errors );
 }
 
 /**
